@@ -1,6 +1,22 @@
 from django.contrib import admin
-from .models import Tag, Post, Category
+from django.contrib.auth.models import Permission, Group
+from django.db.models import Count
+from django.template.response import TemplateResponse
+from django.urls import path
+from django import forms
+from .models import Tag, Post, Category, User
 from django.utils.html import mark_safe
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
+
+
+class PostForm(forms.ModelForm):
+    content = forms.CharField(widget=CKEditorUploadingWidget)
+    class Meta:
+        model = Post
+        fields = '__all__'
+
+class TagInline(admin.TabularInline):
+    model = Post.tags.through
 
 class PostAdmin(admin.ModelAdmin):
     class Media:
@@ -9,6 +25,8 @@ class PostAdmin(admin.ModelAdmin):
         }
         js = ('/static/js/script.js', )
 
+    form = PostForm
+    inlines = (TagInline, )
     list_display = ["id", "title", "content", "active", "created_date", "category", "user"]
     search_fields = ["title", "active", "user__username", "active", "category__name"]
     list_filter = ["title", "category"]
@@ -17,7 +35,12 @@ class PostAdmin(admin.ModelAdmin):
     def avatar(self, post):
         return mark_safe("<img src='/static/{url_img}' alt='{alt}' width='160px'/>".format(url_img=post.image.name, alt=post.title))
 
+class PostInline(admin.StackedInline):
+    model = Post
+    fk_name = 'category'
+
 class CategoryAdmin(admin.ModelAdmin):
+    inlines = (PostInline, )
     list_display = ["id", "name"]
     search_fields = ["name"]
 
@@ -25,7 +48,38 @@ class TagAdmin(admin.ModelAdmin):
     list_display = ["id", "name"]
     search_fields = ["name"]
 
+class UserAdmin(admin.ModelAdmin):
+    list_display = ["id", "username", "first_name", "last_name", "email", "is_staff", "is_superuser", "is_active"]
+    list_filter = ["id", "username", "first_name", "last_name", "is_staff"]
+    search_fields = ["id", "username", "first_name", "last_name"]
+
+class TravelMSAppAdminSite(admin.AdminSite):
+    site_header = 'Travel Management System'
+
+    def get_urls(self):
+        return [
+            path('travel-stats/', self.travel_stats)
+        ] + super().get_urls()
+
+    def travel_stats(self, request):
+
+        post_count = Post.objects.count()
+        stats = Category.objects.annotate(count=Count('post')).values("id", "name", "count")
+        return TemplateResponse(request, 'admin/travel-stats.html', {
+            'post_count': post_count,
+            'stats': stats
+        })
+
+admin_site = TravelMSAppAdminSite('My app travel')
+
+
 # Register your models here.
-admin.site.register(Tag, TagAdmin)
-admin.site.register(Post, PostAdmin)
-admin.site.register(Category, CategoryAdmin)
+# admin.site.register(Tag, TagAdmin)
+# admin.site.register(Post, PostAdmin)
+# admin.site.register(Category, CategoryAdmin)
+admin_site.register(Tag, TagAdmin)
+admin_site.register(Post, PostAdmin)
+admin_site.register(User, UserAdmin)
+admin_site.register(Category, CategoryAdmin)
+admin_site.register(Permission)
+admin_site.register(Group)

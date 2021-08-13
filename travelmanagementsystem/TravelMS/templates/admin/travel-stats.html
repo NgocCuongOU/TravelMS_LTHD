@@ -1,0 +1,10 @@
+{% extends 'admin/base_site.html' %}
+
+{% block content %}
+<h1>Số Post: {{ post_count }}</h1>
+<ul>
+    {% for p in stats %}
+    <li><strong>{{ p.name }}</strong> co: {{ p.count }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}
