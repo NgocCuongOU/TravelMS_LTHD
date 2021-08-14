@@ -1,9 +1,11 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import Post
+from .models import Post, Tag
 from django.views import View
-from rest_framework import viewsets, permissions
-from .serializers import PostSerializer
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import viewsets, permissions, status
+from .serializers import PostSerializer, TagSerializer
 
 
 
@@ -12,11 +14,30 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     # permission_classes = [permissions.IsAuthenticated]
 
-    def get_permissions(self):
-        if self.action == 'list':
-            return [permissions.AllowAny()]
+    # def get_permissions(self):
+    #     if self.action == 'list':
+    #         return [permissions.AllowAny()]
+    #
+    #     return [permissions.IsAuthenticated()]
 
-        return [permissions.IsAuthenticated()]
+    @action(methods=['post'], detail=True, url_path="hide-post", url_name="hide-post")
+    def hide_post(self, request, pk):
+        try:
+            p = Post.objects.get(pk=pk)
+            p.active = False
+            p.save()
+        except Post.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(status=status.HTTP_200_OK, data=PostSerializer(p, context={'request': request}).data)
+
+
+
+class TagViewSet(viewsets.ModelViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
 
 def index(request):
     return render(request, template_name='index.html', context={

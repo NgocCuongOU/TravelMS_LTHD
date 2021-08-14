@@ -6,6 +6,7 @@ from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register('post', views.PostViewSet)
+router.register('tag', views.TagViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
