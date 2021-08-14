@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views import View
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
@@ -25,14 +26,20 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.RetrieveAPI
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.filter(active=True)
     serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
 
-    # def get_permissions(self):
-    #     if self.action == 'list':
-    #         return [permissions.AllowAny()]
-    #
-    #     return [permissions.IsAuthenticated()]
+    def get_permissions(self):
+        if self.action == 'list':
+            return [permissions.AllowAny()]
 
+        return [permissions.IsAuthenticated()]
+
+    @swagger_auto_schema(
+        operation_description='Ẩn một bài viết từ phía client',
+        responses={
+            status.HTTP_200_OK: PostSerializer()
+        }
+    )
     @action(methods=['post'], detail=True, url_path="hide-post", url_name="hide-post")
     def hide_post(self, request, pk):
         try:
