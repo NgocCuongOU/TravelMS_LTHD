@@ -5,8 +5,9 @@ from .admin import admin_site
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register('post', views.PostViewSet)
-router.register('tag', views.TagViewSet)
+router.register('posts', views.PostViewSet)
+router.register('tags', views.TagViewSet)
+router.register('users', views.UserViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

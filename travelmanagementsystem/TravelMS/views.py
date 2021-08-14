@@ -1,18 +1,31 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import Post, Tag
 from django.views import View
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework import viewsets, permissions, status
-from .serializers import PostSerializer, TagSerializer
+from rest_framework.parsers import MultiPartParser
+from rest_framework import viewsets, permissions, status, generics
 
+from .models import Post, Tag, User
+from .serializers import PostSerializer, TagSerializer, UserSerializer
+
+
+class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.RetrieveAPIView):
+    queryset = User.objects.filter(is_active=True)
+    serializer_class = UserSerializer
+    parser_classes = [MultiPartParser, ]
+
+    def get_permissions(self):
+        if self.action == 'retrieve':
+            return [permissions.IsAuthenticated()]
+
+        return [permissions.AllowAny()]
 
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.filter(active=True)
     serializer_class = PostSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     # def get_permissions(self):
     #     if self.action == 'list':

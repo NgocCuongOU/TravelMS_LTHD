@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'TravelMS.apps.TravelmsConfig',
     'ckeditor',
     'ckeditor_uploader',
-    'rest_framework'
+    'rest_framework',
+    'oauth2_provider'
 ]
 
 MIDDLEWARE = [
@@ -55,7 +56,10 @@ MIDDLEWARE = [
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 1
+    'PAGE_SIZE': 1,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+    )
 }
 
 ROOT_URLCONF = 'travelmanagementsystem.urls'
