@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'TravelMS.apps.TravelmsConfig',
     'ckeditor',
     'ckeditor_uploader',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -51,6 +52,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 1
+}
 
 ROOT_URLCONF = 'travelmanagementsystem.urls'
 AUTH_USER_MODEL = 'TravelMS.User'
