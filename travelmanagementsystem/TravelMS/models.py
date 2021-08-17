@@ -4,7 +4,7 @@ from ckeditor.fields import RichTextField
 
 
 class User(AbstractUser):
-    avatar = models.ImageField(upload_to='uploads/%Y/%m')
+    avatar = models.ImageField(upload_to='static/uploads/%Y/%m')
 
 class Category(models.Model):
     name = models.CharField(max_length=100, null=False, unique=True)
@@ -16,7 +16,7 @@ class Category(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=255, null=False)
     content = RichTextField(null=False)
-    image = models.ImageField(upload_to='posts/%Y/%m', default=None)
+    image = models.ImageField(upload_to='static/posts/%Y/%m', default=None, )
     active = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)

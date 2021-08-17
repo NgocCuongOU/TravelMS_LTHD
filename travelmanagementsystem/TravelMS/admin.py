@@ -33,7 +33,7 @@ class PostAdmin(admin.ModelAdmin):
     readonly_fields = ["avatar"]
 
     def avatar(self, post):
-        return mark_safe("<img src='/static/{url_img}' alt='{alt}' width='160px'/>".format(url_img=post.image.name, alt=post.title))
+        return mark_safe("<img src='/{url_img}' alt='{alt}' width='160px'/>".format(url_img=post.image.name, alt=post.title))
 
 class PostInline(admin.StackedInline):
     model = Post
@@ -52,6 +52,10 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ["id", "username", "first_name", "last_name", "email", "is_staff", "is_superuser", "is_active"]
     list_filter = ["id", "username", "first_name", "last_name", "is_staff"]
     search_fields = ["id", "username", "first_name", "last_name"]
+    readonly_fields = ["image"]
+
+    def image(self, user):
+        return mark_safe("<img src='/{img_url}' alt='{alt}' width='150px' />".format(img_url=user.avatar.name, alt=user.first_name))
 
 class TravelMSAppAdminSite(admin.AdminSite):
     site_header = 'Travel Management System'

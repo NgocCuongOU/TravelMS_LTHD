@@ -1,7 +1,12 @@
 from rest_framework.serializers import ModelSerializer
-from .models import Post, Tag, User
+from .models import Post, Tag, User, Category
 
 
+
+class CategorySerializer(ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ["id", "name", "description"]
 
 class UserSerializer(ModelSerializer):
     class Meta:

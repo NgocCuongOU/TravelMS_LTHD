@@ -7,11 +7,11 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
 from rest_framework import viewsets, permissions, status, generics
 
-from .models import Post, Tag, User
-from .serializers import PostSerializer, TagSerializer, UserSerializer
+from .models import Post, Tag, User, Category
+from .serializers import PostSerializer, TagSerializer, UserSerializer, CategorySerializer
 
 
-class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.RetrieveAPIView):
+class UserViewSet(viewsets.ViewSet, generics.ListAPIView,generics.CreateAPIView, generics.RetrieveAPIView):
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
     parser_classes = [MultiPartParser, ]
@@ -22,11 +22,17 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.RetrieveAPI
 
         return [permissions.AllowAny()]
 
+class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.filter(active=True)
     serializer_class = PostSerializer
     # permission_classes = [permissions.IsAuthenticated]
+    pagination_class = None
 
     def get_permissions(self):
         if self.action == 'list':
@@ -59,21 +65,21 @@ class TagViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
-def index(request):
-    return render(request, template_name='index.html', context={
-        'name':'Cao Ngoc Cuong'
-    })
+# def index(request):
+#     return render(request, template_name='index.html', context={
+#         'name':'Cao Ngoc Cuong'
+#     })
 
-def welcome(request, name):
-    return HttpResponse("hello" + str(name))
-
-def welcome2(request, year):
-    return HttpResponse("Regex test" + year)
-
-
-class TestView(View):
-    def get(self, request):
-        return HttpResponse("Hello this is my testing.")
-
-    def post(self, request):
-        pass
+# def welcome(request, name):
+#     return HttpResponse("hello" + str(name))
+#
+# def welcome2(request, year):
+#     return HttpResponse("Regex test" + year)
+#
+#
+# class TestView(View):
+#     def get(self, request):
+#         return HttpResponse("Hello this is my testing.")
+#
+#     def post(self, request):
+#         pass

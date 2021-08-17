@@ -8,6 +8,7 @@ router = DefaultRouter()
 router.register('posts', views.PostViewSet)
 router.register('tags', views.TagViewSet)
 router.register('users', views.UserViewSet)
+router.register('categories', views.CategoryViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

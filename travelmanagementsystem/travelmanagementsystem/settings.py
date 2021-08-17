@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-dc=s-s30b@vron7m4t%2b%zpo*nugea3qjkh%jow)bw$^4%a7('
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# SECURITY WARNING: don't run pywith debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
@@ -44,9 +44,11 @@ INSTALLED_APPS = [
     'oauth2_provider',
     'drf_yasg',
     'debug_toolbar',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -57,13 +59,15 @@ MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
-INTERNAL_IPS = [
-'127.0.0.1'
-]
+CORS_ORIGIN_ALLOW_ALL = True
+
+# INTERNAL_IPS = [
+#     '127.0.0.1'
+# ]
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 1,
+    'PAGE_SIZE': 4,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     )
@@ -142,7 +146,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-MEDIA_ROOT = '%s/TravelMS/static/' % BASE_DIR
+MEDIA_ROOT = '%s/TravelMS/' % BASE_DIR
 CKEDITOR_UPLOAD_PATH = 'posts/'
 
 # Default primary key field type
