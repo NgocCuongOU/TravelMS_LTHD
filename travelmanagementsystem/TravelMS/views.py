@@ -6,12 +6,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
 from rest_framework import viewsets, permissions, status, generics
+from rest_framework.pagination import PageNumberPagination
 
 from .models import Post, Tag, User, Category
 from .serializers import PostSerializer, TagSerializer, UserSerializer, CategorySerializer
 
-
-class UserViewSet(viewsets.ViewSet, generics.ListAPIView,generics.CreateAPIView, generics.RetrieveAPIView):
+class UserViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView, generics.RetrieveAPIView, generics.UpdateAPIView):
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
     parser_classes = [MultiPartParser, ]
@@ -27,12 +27,15 @@ class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
     serializer_class = CategorySerializer
 
 
+class PostPagination(PageNumberPagination):
+    page_size = 6
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.filter(active=True)
     serializer_class = PostSerializer
     # permission_classes = [permissions.IsAuthenticated]
-    pagination_class = None
+    pagination_class = PostPagination
+
 
     def get_permissions(self):
         if self.action == 'list':
