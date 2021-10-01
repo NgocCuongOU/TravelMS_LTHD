@@ -4,7 +4,21 @@ from django.db.models import Count
 from django.template.response import TemplateResponse
 from django.urls import path
 from django import forms
-from .models import Tag, Post, Category, User
+
+from .models import (
+    Tag,
+    Post,
+    Category,
+    User,
+    Tour,
+    TourDetail,
+    TourImages,
+    Rating,
+    CommentTour,
+    CommentPost,
+    ActionPost
+)
+
 from django.utils.html import mark_safe
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
@@ -44,6 +58,12 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = ["id", "name"]
     search_fields = ["name"]
 
+class TourAdmin(admin.ModelAdmin):
+    list_display = ["id", "name", "tour_type", "image", "tour_days",
+                "tour_nights", "adults_price", "children_price", "created_date",
+                "updated_date", "start_date", "end_date", "introduction", "service", "note", "active"]
+    search_fields = ["name"]
+
 class TagAdmin(admin.ModelAdmin):
     list_display = ["id", "name"]
     search_fields = ["name"]
@@ -56,6 +76,7 @@ class UserAdmin(admin.ModelAdmin):
 
     def image(self, user):
         return mark_safe("<img src='/{img_url}' alt='{alt}' width='150px' />".format(img_url=user.avatar.name, alt=user.first_name))
+
 
 class TravelMSAppAdminSite(admin.AdminSite):
     site_header = 'Travel Management System'
@@ -74,6 +95,7 @@ class TravelMSAppAdminSite(admin.AdminSite):
             'stats': stats
         })
 
+
 admin_site = TravelMSAppAdminSite('My app travel')
 
 
@@ -84,6 +106,7 @@ admin_site = TravelMSAppAdminSite('My app travel')
 admin_site.register(Tag, TagAdmin)
 admin_site.register(Post, PostAdmin)
 admin_site.register(User, UserAdmin)
+admin_site.register(Tour, TourAdmin)
 admin_site.register(Category, CategoryAdmin)
 admin_site.register(Permission)
 admin_site.register(Group)

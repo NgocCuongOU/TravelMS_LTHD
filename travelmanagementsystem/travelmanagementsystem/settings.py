@@ -66,12 +66,19 @@ CORS_ORIGIN_ALLOW_ALL = True
 # ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 4,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     )
 }
+
+OAUTH2_INFO = {
+    "client_id": "nFv3qtuT8mgDZdrgPF4sIbj3HZWuTDFBLgkIn6tW",
+    "client_secret": "lr7LZ9Sk2pCpHhFOmUThwbF0u5uLOAHYuLu590YbdYOYBYQ4ZXRSNJ1FZbnMjEEhDDpAQDvv4W02Po9avcptIBQCn2TWBws74oOHQ8ASs2kqlCBsvG9q94XdsNnC6g2D"
+}
+
+# OAUTH2_PROVIDER = {
+#     'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore'
+# }
 
 ROOT_URLCONF = 'travelmanagementsystem.urls'
 AUTH_USER_MODEL = 'TravelMS.User'
@@ -146,7 +153,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-MEDIA_ROOT = '%s/TravelMS/' % BASE_DIR
+MEDIA_ROOT = '%s/TravelMS/static/' % BASE_DIR
 CKEDITOR_UPLOAD_PATH = 'posts/'
 
 # Default primary key field type
