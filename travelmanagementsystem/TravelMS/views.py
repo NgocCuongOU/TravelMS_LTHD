@@ -22,6 +22,8 @@ from .models import (
     Category,
     ActionPost,
     Tour,
+    TourSchedules,
+    TourImages,
     CommentPost,
     CommentTour,
     Rating,
@@ -35,6 +37,8 @@ from .serializers import (
     CategorySerializer,
     ActionPostSerializer,
     TourSerializer,
+    TourSchedulesSerializer,
+    TourImagesSerializer,
     RatingSerializer,
     PostViewSerializer,
     CommentPostSerializer,
@@ -164,7 +168,7 @@ class TagViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class TourViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
+class TourViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView, generics.DestroyAPIView):
     serializer_class = TourSerializer
     pagination_class = BasePagination
 
@@ -198,6 +202,31 @@ class TourViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
             return Response(CommentTourSerializer(comment).data, status=status.HTTP_201_CREATED)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['get'], detail=True, url_path='schedules')
+    def get_schedules(self, request, pk):
+        tour = Tour.objects.get(pk=pk)
+        schedules = tour.tour_detail_tour
+
+        return Response(TourSchedulesSerializer(schedules, many=True).data, status=status.HTTP_200_OK)
+
+    @action(methods=['get'], detail=True, url_path='images')
+    def get_imagestour(self, request, pk):
+        tour = Tour.objects.get(pk=pk)
+        images = tour.tour_image
+
+        serialiser = TourImagesSerializer(images, context={'request': request}, many=True)
+        return Response(serialiser.data, status=status.HTTP_200_OK)
+
+
+class TourSchedulesViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
+    queryset = TourSchedules.objects.all()
+    permission_classes = [permissions.AllowAny]
+    serializer_class = TourSchedulesSerializer
+
+class TourImagesViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
+    queryset = TourImages.objects.all()
+    serializer_class = TourImagesSerializer
 
 class CommentPostViewSet(viewsets.ViewSet, generics.DestroyAPIView, generics.UpdateAPIView):
     queryset = CommentPost.objects.all()

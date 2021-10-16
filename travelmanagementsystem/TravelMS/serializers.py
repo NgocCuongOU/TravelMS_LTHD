@@ -1,4 +1,10 @@
+from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from django.contrib.staticfiles.storage import staticfiles_storage
+from django.templatetags.static import static
+from django.conf import settings
+from django.contrib.staticfiles.finders import find
+
 from .models import (
     Post,
     Tag,
@@ -9,6 +15,8 @@ from .models import (
     CommentTour,
     Rating,
     Tour,
+    TourSchedules,
+    TourImages,
     PostView
 )
 
@@ -65,6 +73,7 @@ class PostViewSerializer(ModelSerializer):
         model = PostView
         fields = ["post", "views"]
 
+
 class TourSerializer(ModelSerializer):
     image = SerializerMethodField()
 
@@ -85,6 +94,30 @@ class TourSerializer(ModelSerializer):
         fields = ["id", "name", "tour_type", "image", "tour_days",
                 "tour_nights", "adults_price", "children_price", "created_date",
                 "updated_date", "start_date", "end_date", "introduction", "service", "note", "active"]
+
+class TourSchedulesSerializer(ModelSerializer):
+    class Meta:
+        model = TourSchedules
+        fields = ["id", "tour", "start_date", "end_date", "destination", "departure", "travel_schedule"]
+
+
+class TourImagesSerializer(ModelSerializer):
+    image = serializers.SerializerMethodField('get_image')
+
+    def get_image(self, obj):
+        request = self.context["request"]
+
+        name = obj.image.name
+        if name.startswith('/static'):
+            path = '/%s' % name
+        else:
+            path = '/static/%s' % name
+
+        return request.build_absolute_uri(path)
+
+    class Meta:
+        model = TourImages
+        fields = ["id", "image", "tour"]
 
 class ActionPostSerializer(ModelSerializer):
     class Meta:

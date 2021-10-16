@@ -12,6 +12,8 @@ router.register('categories', views.CategoryViewSet, "category")
 router.register('tours', views.TourViewSet, "tour")
 router.register('comment-post', views.CommentPostViewSet, "comment-post")
 router.register('comment-tour', views.CommentTourViewSet, "comment-tour")
+router.register('tour-schedules', views.TourSchedulesViewSet, "tour-schedules")
+router.register('tour-images', views.TourImagesViewSet, "tour-images")
 
 urlpatterns = [
     path('', include(router.urls)),

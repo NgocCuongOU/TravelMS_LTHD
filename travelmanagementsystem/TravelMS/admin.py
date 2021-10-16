@@ -11,7 +11,7 @@ from .models import (
     Category,
     User,
     Tour,
-    TourDetail,
+    TourSchedules,
     TourImages,
     Rating,
     CommentTour,
@@ -61,8 +61,16 @@ class CategoryAdmin(admin.ModelAdmin):
 class TourAdmin(admin.ModelAdmin):
     list_display = ["id", "name", "tour_type", "image", "tour_days",
                 "tour_nights", "adults_price", "children_price", "created_date",
-                "updated_date", "start_date", "end_date", "introduction", "service", "note", "active"]
+                "updated_date", "start_date", "end_date", "active"]
     search_fields = ["name"]
+
+class TourSchedulesAdmin(admin.ModelAdmin):
+    list_display = ["id", "tour", "departure", "destination", "start_date", "end_date"]
+    search_fields = ["departure", "destination"]
+
+class TourImagesAdmin(admin.ModelAdmin):
+    list_display = ["id", "tour", "image"]
+    search_fields = ["id", "tour"]
 
 class TagAdmin(admin.ModelAdmin):
     list_display = ["id", "name"]
@@ -107,6 +115,8 @@ admin_site.register(Tag, TagAdmin)
 admin_site.register(Post, PostAdmin)
 admin_site.register(User, UserAdmin)
 admin_site.register(Tour, TourAdmin)
+admin_site.register(TourSchedules, TourSchedulesAdmin)
+admin_site.register(TourImages, TourImagesAdmin)
 admin_site.register(Category, CategoryAdmin)
 admin_site.register(Permission)
 admin_site.register(Group)

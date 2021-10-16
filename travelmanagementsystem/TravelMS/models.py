@@ -99,11 +99,11 @@ class Tour(ModelBase):
     tour_nights = models.IntegerField(default=0)
     adults_price = models.IntegerField(null=False)
     children_price = models.IntegerField(null=False)
-    start_date = models.DateTimeField(null=True)
-    end_date = models.DateTimeField(null=True)
-    introduction = models.TextField(null=True)
-    service = models.TextField(null=True)
-    note = models.TextField(null=True)
+    start_date = models.DateField(null=True)
+    end_date = models.DateField(null=True)
+    introduction = RichTextField(null=True)
+    service = RichTextField(null=True)
+    note = RichTextField(null=True)
     active = models.BooleanField(default=True)
 
     def __str__(self):
@@ -115,13 +115,13 @@ class TourImages(models.Model):
     tour = models.ForeignKey(Tour, related_name='tour_image', on_delete=models.CASCADE)
 
 
-class TourDetail(models.Model):
-    tour = models.OneToOneField(Tour, on_delete=models.CASCADE, primary_key=True)
+class TourSchedules(models.Model):
+    tour = models.ForeignKey(Tour, related_name="tour_detail_tour", on_delete=models.SET_NULL, null=True)
     departure = models.CharField(max_length=255, null=True)
     destination = models.CharField(max_length=255, null=True)
-    start_date = models.DateTimeField(null=True)
-    end_date = models.DateTimeField(null=True)
-    travel_schedule = models.TextField(null=True)
+    start_date = models.DateField(null=True)
+    end_date = models.DateField(null=True)
+    travel_schedule = RichTextField(null=True)
 
     def __str__(self):
         return self.departure
