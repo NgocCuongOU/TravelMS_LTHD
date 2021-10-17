@@ -23,11 +23,12 @@ class Category(models.Model):
 class Post(ModelBase):
     class Meta:
         unique_together = ("title", "category")
-        ordering = ["-id"]
+        ordering = ["id"]
 
 
     title = models.CharField(max_length=255, null=False)
     content = RichTextField(null=False)
+    description = models.TextField(max_length=255, null=False, default=None)
     image = models.ImageField(upload_to='posts/%Y/%m', default=None, )
     active = models.BooleanField(default=True)
     category = models.ForeignKey(Category, related_name='post',on_delete=models.PROTECT, null=True)

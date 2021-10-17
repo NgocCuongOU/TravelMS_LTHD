@@ -41,7 +41,7 @@ class PostAdmin(admin.ModelAdmin):
 
     form = PostForm
     inlines = (TagInline, )
-    list_display = ["id", "title", "content", "active", "created_date", "category", "user"]
+    list_display = ["id", "title", "active", "created_date", "category", "user"]
     search_fields = ["title", "active", "user__username", "active", "category__name"]
     list_filter = ["title", "category"]
     readonly_fields = ["avatar"]
