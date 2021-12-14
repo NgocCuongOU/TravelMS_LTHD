@@ -61,7 +61,7 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView):
 
     @action(methods=['get'], detail=False, url_path="current-user")
     def get_current_user(self, request):
-        return Response(self.serializer_class(request.user).data, status=status.HTTP_200_OK)
+        return Response(self.serializer_class(request.user, context={'request': request}).data, status=status.HTTP_200_OK)
 
 
 class AuthInfo(APIView):
@@ -161,6 +161,12 @@ class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
             return Response(CommentPostSerializer(comment).data, status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+    @action(methods=['get'], detail=True, url_path="comments")
+    def comments(self, request, pk):
+        post = self.get_object()
+        comments = post.comment_post
+
+        return Response(CommentPostSerializer(comments, many=True, context={'request': request}).data, status.HTTP_200_OK)
 
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
@@ -188,7 +194,11 @@ class TourViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
         except Union[IndexError, ValueError]:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
-            r = Rating.objects.create(rate=rating, tour=self.get_object(), user=request.user)
+            r = Rating.objects.update_or_create(
+                tour=self.get_object(),
+                user=request.user,
+                defaults={"rate": rating}
+            )
 
             return Response(RatingSerializer(r).data, status=status.HTTP_200_OK)
 
@@ -202,6 +212,14 @@ class TourViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
             return Response(CommentTourSerializer(comment).data, status=status.HTTP_201_CREATED)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['get'], detail=True, url_path="comments")
+    def comments(self, request, pk):
+        tour = self.get_object()
+        comments = tour.comment_tour
+
+        return Response(CommentTourSerializer(comments, many=True, context={'request': request}).data,
+                        status=status.HTTP_200_OK)
 
     @action(methods=['get'], detail=True, url_path='schedules')
     def get_schedules(self, request, pk):

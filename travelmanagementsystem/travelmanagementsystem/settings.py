@@ -76,9 +76,9 @@ OAUTH2_INFO = {
     "client_secret": "lr7LZ9Sk2pCpHhFOmUThwbF0u5uLOAHYuLu590YbdYOYBYQ4ZXRSNJ1FZbnMjEEhDDpAQDvv4W02Po9avcptIBQCn2TWBws74oOHQ8ASs2kqlCBsvG9q94XdsNnC6g2D"
 }
 
-# OAUTH2_PROVIDER = {
-#     'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore'
-# }
+OAUTH2_PROVIDER = {
+    'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore'
+}
 
 ROOT_URLCONF = 'travelmanagementsystem.urls'
 AUTH_USER_MODEL = 'TravelMS.User'

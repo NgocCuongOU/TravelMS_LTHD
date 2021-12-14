@@ -66,7 +66,11 @@ class PostSerializer(ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ["id", "title", "content", "description", "created_date", "updated_date", "image", "active", "category", "user", "tags", "category"]
+        fields = ["id", "title", "content", "description",
+                  "created_date", "updated_date", "image",
+                  "active", "category", "user", "tags",
+                  "category"]
+
 
 class PostViewSerializer(ModelSerializer):
     class Meta:
@@ -76,6 +80,7 @@ class PostViewSerializer(ModelSerializer):
 
 class TourSerializer(ModelSerializer):
     image = SerializerMethodField()
+    rate = SerializerMethodField()
 
     def get_image(self, tour):
 
@@ -89,11 +94,21 @@ class TourSerializer(ModelSerializer):
 
         return request.build_absolute_uri(path)
 
+    def get_rate(self, tour):
+        request = self.context.get("request")
+        if request and request.user.is_authenticated:
+            r = tour.rating_tour.filter(user=request.user).first()
+
+            if r:
+                return r.rate
+
+        return -1
+
     class Meta:
         model = Tour
         fields = ["id", "name", "tour_type", "image", "tour_days",
                 "tour_nights", "adults_price", "children_price", "created_date",
-                "updated_date", "start_date", "end_date", "introduction", "service", "note", "active"]
+                "updated_date", "start_date", "end_date", "introduction", "service", "note", "active", "rate"]
 
 class TourSchedulesSerializer(ModelSerializer):
     class Meta:
@@ -124,15 +139,21 @@ class ActionPostSerializer(ModelSerializer):
         model = ActionPost
         fields = ["id", "type", "created_date"]
 
+
 class CommentPostSerializer(ModelSerializer):
+    user = UserSerializer()
+
     class Meta:
         model = CommentPost
-        fields = ["id", "content", "created_date", "updated_date"]
+        fields = ["id", "content", "created_date", "updated_date", "post", "user"]
+
 
 class CommentTourSerializer(ModelSerializer):
+    user = UserSerializer()
+
     class Meta:
         model = CommentTour
-        fields = ["id", "content", "created_date", "updated_date"]
+        fields = ["id", "content", "created_date", "updated_date", "tour", "user"]
 
 
 class RatingSerializer(ModelSerializer):

@@ -25,7 +25,6 @@ class Post(ModelBase):
         unique_together = ("title", "category")
         ordering = ["id"]
 
-
     title = models.CharField(max_length=255, null=False)
     content = RichTextField(null=False)
     description = models.TextField(max_length=255, null=False, default=None)
@@ -83,6 +82,10 @@ class ActionPost(ModelBase):
 
 
 class Rating(ModelBase):
+
+    class Meta:
+        unique_together = ("tour", "user")
+
     tour = models.ForeignKey('Tour', related_name='rating_tour', on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     rate = models.PositiveSmallIntegerField(default=0)
