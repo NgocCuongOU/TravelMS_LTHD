@@ -6,6 +6,7 @@ from ckeditor.fields import RichTextField
 class User(AbstractUser):
     avatar = models.ImageField(upload_to='uploads/%Y/%m')
 
+
 class ModelBase(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
@@ -13,12 +14,14 @@ class ModelBase(models.Model):
     class Meta:
         abstract = True
 
+
 class Category(models.Model):
     name = models.CharField(max_length=100, null=False, unique=True)
     description = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.name
+
 
 class Post(ModelBase):
     class Meta:
@@ -37,8 +40,9 @@ class Post(ModelBase):
     def __str__(self):
         return self.title
 
+
 class PostView(ModelBase):
-    post = models.OneToOneField(Post, on_delete=models.CASCADE, primary_key=True)
+    post = models.OneToOneField(Post, related_name='post_view', on_delete=models.CASCADE, primary_key=True)
     views = models.IntegerField(default=0)
 
 

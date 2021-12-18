@@ -49,9 +49,18 @@ class TagSerializer(ModelSerializer):
         fields = ["id", "name"]
 
 
+class PostViewSerializer(ModelSerializer):
+    class Meta:
+        model = PostView
+        fields = ["post", "views"]
+
+
 class PostSerializer(ModelSerializer):
     image = SerializerMethodField()
     tags = TagSerializer(many=True)
+    user = UserSerializer()
+    category = CategorySerializer()
+    comment_count = SerializerMethodField()
 
     def get_image(self, post):
         request = self.context["request"]
@@ -63,24 +72,19 @@ class PostSerializer(ModelSerializer):
             path = '/static/%s' % name
         return request.build_absolute_uri(path)
 
+    def get_comment_count(self, post):
+        return post.comment_count
 
     class Meta:
         model = Post
         fields = ["id", "title", "content", "description",
                   "created_date", "updated_date", "image",
-                  "active", "category", "user", "tags",
-                  "category"]
-
-
-class PostViewSerializer(ModelSerializer):
-    class Meta:
-        model = PostView
-        fields = ["post", "views"]
-
+                  "active", "user", "tags", "category", "comment_count"]
 
 class TourSerializer(ModelSerializer):
     image = SerializerMethodField()
     rate = SerializerMethodField()
+    comment_count = SerializerMethodField()
 
     def get_image(self, tour):
 
@@ -104,11 +108,15 @@ class TourSerializer(ModelSerializer):
 
         return -1
 
+    def get_comment_count(self, tour):
+        return tour.comment_count
+
     class Meta:
         model = Tour
         fields = ["id", "name", "tour_type", "image", "tour_days",
                 "tour_nights", "adults_price", "children_price", "created_date",
-                "updated_date", "start_date", "end_date", "introduction", "service", "note", "active", "rate"]
+                "updated_date", "start_date", "end_date", "introduction", "service",
+                "note", "active", "rate", "comment_count"]
 
 class TourSchedulesSerializer(ModelSerializer):
     class Meta:

@@ -45,7 +45,7 @@ from .serializers import (
     CommentTourSerializer,
 )
 
-from django.db.models import F
+from django.db.models import F, Count
 
 
 class UserViewSet(viewsets.ViewSet, generics.CreateAPIView):
@@ -83,7 +83,9 @@ class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
         return [permissions.AllowAny()]
 
     def get_queryset(self):
-        post = Post.objects.filter(active=True)
+        post = Post.objects.filter(active=True).annotate(
+            comment_count = Count('comment_post')
+        )
 
         q = self.request.query_params.get('q')
         if q is not None:
@@ -141,7 +143,7 @@ class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
 
             return Response(ActionPostSerializer(action).data, status=status.HTTP_200_OK)
 
-    @action(methods=['get'], detail=True, url_path="postview")
+    @action(methods=['get'], detail=True, url_path="views")
     def inc_view(self, request, pk):
         v, created = PostView.objects.get_or_create(post=self.get_object())
         v.views = F('views') + 1
@@ -168,6 +170,33 @@ class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
 
         return Response(CommentPostSerializer(comments, many=True, context={'request': request}).data, status.HTTP_200_OK)
 
+    @action(methods=['get'], detail=False, url_path='recently_posts')
+    def recently_post(self, request):
+        post = Post.objects.all().annotate(
+            comment_count = Count('comment_post')
+        )
+        recently_post = post.order_by("-created_date")[0:5]
+
+        return Response(PostSerializer(recently_post, many=True, context={'request': request}).data, status=status.HTTP_200_OK)
+
+    @action(methods=['get'], detail=False, url_path='recently_posts_main')
+    def recently_post2(self, request):
+        post = Post.objects.all().annotate(
+            comment_count = Count('comment_post')
+        )
+        recently_post = post.order_by("-created_date")[0:3]
+
+        return Response(PostSerializer(recently_post, many=True, context={'request': request}).data,
+                        status=status.HTTP_200_OK)
+
+    @action(methods=['get'], detail=True, url_path='related_posts')
+    def related_post(self, request, pk):
+        related_post = Post.objects.filter(category__name__icontains=self.get_object().category).order_by('-created_date')[0:3]
+
+        return Response(PostSerializer(related_post, many=True, context={'request': request}).data,
+                        status=status.HTTP_200_OK)
+
+
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
@@ -179,7 +208,9 @@ class TourViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
     pagination_class = BasePagination
 
     def get_queryset(self):
-        tour = Tour.objects.filter(active = True)
+        tour = Tour.objects.filter(active=True).annotate(
+            comment_count = Count('comment_tour')
+        )
 
         q = self.request.query_params.get('q')
         if q is not None:
@@ -242,9 +273,11 @@ class TourSchedulesViewSet(viewsets.ViewSet, generics.ListAPIView, generics.Retr
     permission_classes = [permissions.AllowAny]
     serializer_class = TourSchedulesSerializer
 
+
 class TourImagesViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
     queryset = TourImages.objects.all()
     serializer_class = TourImagesSerializer
+
 
 class CommentPostViewSet(viewsets.ViewSet, generics.DestroyAPIView, generics.UpdateAPIView):
     queryset = CommentPost.objects.all()
