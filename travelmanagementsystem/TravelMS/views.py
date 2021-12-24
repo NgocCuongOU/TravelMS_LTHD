@@ -10,7 +10,7 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework import viewsets, permissions, status, generics
 from rest_framework.views import APIView
 
-from .paginator import BasePagination
+from .paginator import BaseTourPagination, BasePostPagination
 from django.http import Http404
 
 from django.conf import settings
@@ -27,7 +27,8 @@ from .models import (
     CommentPost,
     CommentTour,
     Rating,
-    PostView
+    PostView,
+    Booking
 )
 
 from .serializers import (
@@ -41,8 +42,10 @@ from .serializers import (
     TourImagesSerializer,
     RatingSerializer,
     PostViewSerializer,
+    PostSerializer2,
     CommentPostSerializer,
     CommentTourSerializer,
+    BookingSerializer
 )
 
 from django.db.models import F, Count
@@ -75,7 +78,7 @@ class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
 
 class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
     serializer_class = PostSerializer
-    pagination_class = BasePagination
+    pagination_class = BasePostPagination
 
     def get_permissions(self):
         if self.action in ['take_action', 'add_comment']:
@@ -191,9 +194,11 @@ class PostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
 
     @action(methods=['get'], detail=True, url_path='related_posts')
     def related_post(self, request, pk):
-        related_post = Post.objects.filter(category__name__icontains=self.get_object().category).order_by('-created_date')[0:3]
+        cate = self.get_object().category
+        related_post = Post.objects.filter(category__name__icontains=cate)
+        related_final = related_post.exclude(id=pk).order_by('-created_date')[0:3]
 
-        return Response(PostSerializer(related_post, many=True, context={'request': request}).data,
+        return Response(PostSerializer2(related_final, many=True, context={'request': request}).data,
                         status=status.HTTP_200_OK)
 
 
@@ -205,7 +210,7 @@ class TagViewSet(viewsets.ModelViewSet):
 
 class TourViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView, generics.DestroyAPIView):
     serializer_class = TourSerializer
-    pagination_class = BasePagination
+    pagination_class = BaseTourPagination
 
     def get_queryset(self):
         tour = Tour.objects.filter(active=True).annotate(
@@ -241,6 +246,20 @@ class TourViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIVi
             comment = CommentTour.objects.create(content=content, user=request.user, tour=self.get_object())
 
             return Response(CommentTourSerializer(comment).data, status=status.HTTP_201_CREATED)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=True, url_path="booking")
+    def booking(self, request, pk):
+        adults = request.data.get('adults')
+        children = request.data.get('children')
+        total = request.data.get('total')
+
+        if adults and children and total:
+            booking = Booking.objects.create(adults=adults, user=request.user, tour=self.get_object(), children=children,
+                                             total=total, active=True)
+
+            return Response(BookingSerializer(booking).data, status=status.HTTP_201_CREATED)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
 

@@ -5,6 +5,7 @@ from ckeditor.fields import RichTextField
 
 class User(AbstractUser):
     avatar = models.ImageField(upload_to='uploads/%Y/%m')
+    phone = models.CharField(max_length=11, null=True, unique=True)
 
 
 class ModelBase(models.Model):
@@ -136,7 +137,7 @@ class TourSchedules(models.Model):
 
 
 class Booking(models.Model):
-    price = models.BigIntegerField(null=False)
+    total = models.BigIntegerField(null=True)
     adults = models.IntegerField(null=False)
     children = models.IntegerField(null=False)
     active = models.BooleanField(default=True)

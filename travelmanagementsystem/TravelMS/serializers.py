@@ -17,7 +17,8 @@ from .models import (
     Tour,
     TourSchedules,
     TourImages,
-    PostView
+    PostView,
+    Booking
 )
 
 
@@ -37,7 +38,7 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "first_name", "last_name", "username", "password", "email", "avatar", "date_joined"]
+        fields = ["id", "first_name", "last_name", "username", "password", "email", "avatar", "phone"]
         extra_kwargs = {
             'password': {'write_only': 'True'}
         }
@@ -81,6 +82,27 @@ class PostSerializer(ModelSerializer):
                   "created_date", "updated_date", "image",
                   "active", "user", "tags", "category", "comment_count"]
 
+
+class PostSerializer2(ModelSerializer):
+    image = SerializerMethodField()
+    user = UserSerializer()
+
+    def get_image(self, post):
+        request = self.context["request"]
+
+        name = post.image.name
+        if name.startswith('/static'):
+            path = '/%s' % name
+        else:
+            path = '/static/%s' % name
+        return request.build_absolute_uri(path)
+
+    class Meta:
+        model = Post
+        fields = ["id", "title", "description", "user",
+                  "created_date", "updated_date", "image"]
+
+
 class TourSerializer(ModelSerializer):
     image = SerializerMethodField()
     rate = SerializerMethodField()
@@ -118,10 +140,17 @@ class TourSerializer(ModelSerializer):
                 "updated_date", "start_date", "end_date", "introduction", "service",
                 "note", "active", "rate", "comment_count"]
 
+
 class TourSchedulesSerializer(ModelSerializer):
     class Meta:
         model = TourSchedules
         fields = ["id", "tour", "start_date", "end_date", "destination", "departure", "travel_schedule"]
+
+
+class BookingSerializer(ModelSerializer):
+    class Meta:
+        model = Booking
+        fields = ["id", "adults", "children", "total", "active", "tour", "user"]
 
 
 class TourImagesSerializer(ModelSerializer):
